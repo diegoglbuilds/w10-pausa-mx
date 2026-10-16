@@ -61,6 +61,11 @@ describe("buyer-first product constraints", () => {
     fireEvent.click(screen.getByRole("button", { name: /ver mi resultado/i }));
     expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ knownFeesMxn: 0 }));
   });
+  it("explains what the optional monthly maximum is compared against", () => {
+    render(<ManualForm onSubmit={() => {}} onBack={() => {}} />);
+    expect(screen.getByLabelText(/tu máximo mensual/i)).toBeInTheDocument();
+    expect(screen.getByText(/define cuánto quieres destinar en total al mes.*gastos esenciales, pagos actuales y esta compra/i)).toBeInTheDocument();
+  });
   it("checks comprehension without blocking continuation", () => {
     render(<ComprehensionCheck result={calculateCheck(entry)} onBack={() => {}} onContinue={() => {}} />);
     expect(screen.getByLabelText(/¿cuánto pagarías en total/i)).toBeInTheDocument();

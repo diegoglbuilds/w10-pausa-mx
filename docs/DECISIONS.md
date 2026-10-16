@@ -50,3 +50,16 @@ Run a mobile walkthrough with the synthetic Karla persona. Check whether she can
 - **Regression test:** Added a form test proving blank known fees are rejected and an explicitly entered zero is accepted.
 - **Remaining risks:** No live browser or production walkthrough was available. Vision and external explanation behavior remain unverified in a browser. A persona test is still needed.
 - **Next session first move:** persona test.
+
+## Persona Test — Post Mechanical Fix
+
+- **Synthetic persona:** Karla Hernández, fictional / synthetic, age 29, Estado de México, with variable disposable income and checkout-focused shopping habits.
+- **Testing method:** Source-based walkthrough of implemented UI copy, rendered structure, state transitions, schemas, deterministic finance logic, and workflow tests. Added a rendered-copy regression test and re-traced the affected form state. This is not real user research.
+- **Browser/screenshot limitation:** Browser automation was unavailable. No captured browser or production screenshots were available; the repository mockup is not a screenshot. No clicks, visual observations, or production behavior are claimed.
+- **Worst confusion:** “Tu límite mensual” did not explain that the entered amount was compared with essential expenses, current payments, and the new purchase. It could sound like an app-imposed credit or installment limit.
+- **Design decision:** State directly that the optional value is the user's own maximum total monthly allocation and list the categories used in its existing comparison. Keep the value optional and preserve the neutral no-limit state.
+- **Fix:** Renamed the field to “Tu máximo mensual (opcional)” and explained what it is compared against. Deterministic finance logic was unchanged.
+- **Re-test result:** Source re-trace confirms the user-set meaning is explicit at entry, blank remains no-limit, changing the value continues to affect only advisory outputs, and the continue-anyway action remains available. Regression coverage checks the visible label and explanation. Comprehension for a real shopper remains unmeasured.
+- **Simple-alternative comparison:** A calculator can multiply installments and a calendar can record dates. Pausa MX additionally combines the schedule, known total, next-month obligation, visible unknowns, and optional user-defined comparison. Calculator + calendar could produce similar understanding with more manual setup; no evidence yet shows Pausa MX is faster or that Karla would voluntarily use it before checkout.
+- **Remaining risk:** Required context fields and the comprehension check may feel like homework; “known total” can differ from offer price if payment × count differs; the 30-second claim is unmeasured; simulated screenshot values may be mistaken for extraction; no real user has tested whether “Espera” feels advisory.
+- **Next session first move:** final deploy verification and submission artifacts.

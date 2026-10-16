@@ -44,7 +44,7 @@ export function ManualForm({ onSubmit, onBack, draft, aiLabel }: Props) {
     <div className="form-grid">
       <Field label="Gastos esenciales mensuales" value={values.essentialExpensesMxn} onChange={(v) => update("essentialExpensesMxn", v)} placeholder="0" hint="Si no quieres contarlos, escribe 0." required />
       <Field label="Pagos actuales a meses" value={values.existingMonthlyPaymentsMxn} onChange={(v) => update("existingMonthlyPaymentsMxn", v)} placeholder="0" hint="Incluye los pagos que conoces; escribe 0 si no tienes." required />
-      <Field label="Tu límite mensual (opcional)" value={values.selfSetMonthlyLimitMxn} onChange={(v) => update("selfSetMonthlyLimitMxn", v)} placeholder="Sin límite definido" hint="Tú lo defines; cambiarlo no modifica los cálculos." />
+      <Field label="Tu máximo mensual (opcional)" value={values.selfSetMonthlyLimitMxn} onChange={(v) => update("selfSetMonthlyLimitMxn", v)} placeholder="Sin límite definido" hint="Define cuánto quieres destinar en total al mes. Lo comparamos con tus gastos esenciales, pagos actuales y esta compra." />
     </div>
     <p className="notice amber" style={{marginTop:16}}>No vemos todas tus deudas. Solo contamos lo que tú incluyes; otros pagos pueden faltar.</p>
     {errors.length > 0 && <ul className="error" role="alert">{errors.map((error, i) => <li key={`${error}-${i}`}>{error}</li>)}</ul>}
