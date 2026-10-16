@@ -3,12 +3,13 @@
 import { useState, type FormEvent } from "react";
 import { purchaseSchema, type PurchaseInput } from "@/lib/schema";
 
-type Props = { onSubmit: (input: PurchaseInput) => void; onBack: () => void };
-const initial = { priceMxn: "", installmentCount: "6", installmentAmountMxn: "", firstDueDate: "", knownFeesMxn: "", essentialExpensesMxn: "", existingMonthlyPaymentsMxn: "", selfSetMonthlyLimitMxn: "" };
+type OfferDraft = { priceMxn: number | null; installmentCount: number | null; installmentAmountMxn: number | null };
+type Props = { onSubmit: (input: PurchaseInput) => void; onBack: () => void; draft?: OfferDraft | null; aiLabel?: string | null };
+const initial = (draft?: OfferDraft | null) => ({ priceMxn: draft?.priceMxn?.toString() ?? "", installmentCount: draft ? draft.installmentCount?.toString() ?? "" : "6", installmentAmountMxn: draft?.installmentAmountMxn?.toString() ?? "", firstDueDate: "", knownFeesMxn: "", essentialExpensesMxn: "", existingMonthlyPaymentsMxn: "", selfSetMonthlyLimitMxn: "" });
 const pesos = (s: string) => s === "" ? null : Number(s);
 
-export function ManualForm({ onSubmit, onBack }: Props) {
-  const [values, setValues] = useState(initial);
+export function ManualForm({ onSubmit, onBack, draft, aiLabel }: Props) {
+  const [values, setValues] = useState(() => initial(draft));
   const [errors, setErrors] = useState<string[]>([]);
   const [feesUnknown, setFeesUnknown] = useState(true);
   const [dateUnknown, setDateUnknown] = useState(true);
@@ -20,14 +21,14 @@ export function ManualForm({ onSubmit, onBack }: Props) {
       installmentAmountMxn: pesos(values.installmentAmountMxn), firstDueDate: dateUnknown ? null : values.firstDueDate,
       knownFeesMxn: feesUnknown ? null : pesos(values.knownFeesMxn), essentialExpensesMxn: Number(values.essentialExpensesMxn || 0),
       existingMonthlyPaymentsMxn: Number(values.existingMonthlyPaymentsMxn || 0), selfSetMonthlyLimitMxn: pesos(values.selfSetMonthlyLimitMxn),
-      otherDebtsNotIncluded: true, source: "manual", confirmedByUser: true,
+      otherDebtsNotIncluded: true, source: aiLabel ? "screenshot" : "manual", confirmedByUser: true,
     });
     if (!parsed.success) { setErrors(parsed.error.issues.map((issue) => issue.message)); return; }
     setErrors([]); onSubmit(parsed.data);
   }
   return <form className="card" onSubmit={submit} noValidate>
     <div className="stepper"><span className="step active"><b>1</b> Compra</span><span>────</span><span className="step"><b>2</b> Tu situación</span><span>────</span><span className="step"><b>3</b> Resultado</span></div>
-    <div className="section-head"><span className="badge">Manual · sin conectar cuentas</span><h2 style={{marginTop:12}}>Datos de la compra</h2><p>Escribe lo que conoces. Lo que falte seguirá marcado como desconocido.</p></div>
+    <div className="section-head"><span className="badge">{aiLabel ?? "Manual · sin conectar cuentas"}</span><h2 style={{marginTop:12}}>Datos de la compra</h2><p>Escribe lo que conoces. Lo que falte seguirá marcado como desconocido.</p></div>
     <div className="form-grid">
       <Field label="Precio de compra (MXN)" value={values.priceMxn} onChange={(v) => update("priceMxn", v)} placeholder="3,000" required />
       <Field label="Número de mensualidades" value={values.installmentCount} onChange={(v) => update("installmentCount", v)} type="number" min="1" max="48" required />

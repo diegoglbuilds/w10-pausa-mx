@@ -29,3 +29,9 @@ export function isRealDate(value: string): boolean {
 export const screenshotRequestSchema = z.object({
   imageDataUrl: z.string().max(5_600_000).regex(/^data:image\/(png|jpeg|webp);base64,/),
 });
+
+export const extractedOfferSchema = z.object({
+  priceMxn: money.nullable(),
+  installmentCount: z.number().int().min(1).max(48).nullable(),
+  installmentAmountMxn: money.nullable(),
+});
