@@ -19,15 +19,18 @@ export type CheckResult = {
 
 export function calculateCheck(input: PurchaseInput, referenceDate = new Date()): CheckResult {
   const monthlyPaymentMxn = input.installmentAmountMxn ?? round(input.priceMxn / input.installmentCount);
-  const totalKnownCostMxn = round(monthlyPaymentMxn * input.installmentCount + (input.knownFeesMxn ?? 0));
+  const totalKnownCostMxn = round((input.installmentAmountMxn === null ? input.priceMxn : monthlyPaymentMxn * input.installmentCount) + (input.knownFeesMxn ?? 0));
   const timeline = Array.from({ length: input.installmentCount }, (_, index) => {
     const due = input.firstDueDate ? addMonths(input.firstDueDate, index) : null;
     return { label: due ? formatMonth(due) : `Pago ${index + 1}`, date: due, amountMxn: monthlyPaymentMxn };
   });
   const nextMonth = new Date(referenceDate.getFullYear(), referenceDate.getMonth() + 1, 1);
   const nextMonthEnd = new Date(referenceDate.getFullYear(), referenceDate.getMonth() + 2, 0);
-  const firstDate = input.firstDueDate ? parseDate(input.firstDueDate) : null;
-  const newPaymentDueNextMonth = !firstDate || (firstDate >= nextMonth && firstDate <= nextMonthEnd);
+  const newPaymentDueNextMonth = input.firstDueDate === null || timeline.some(({ date }) => {
+    if (!date) return false;
+    const due = parseDate(date);
+    return due >= nextMonth && due <= nextMonthEnd;
+  });
   const nextMonthKnownObligationMxn = round(input.existingMonthlyPaymentsMxn + (newPaymentDueNextMonth ? monthlyPaymentMxn : 0));
   const monthlyBaselineMxn = round(input.essentialExpensesMxn + input.existingMonthlyPaymentsMxn);
   const monthlyTotalWithPurchaseMxn = round(monthlyBaselineMxn + monthlyPaymentMxn);

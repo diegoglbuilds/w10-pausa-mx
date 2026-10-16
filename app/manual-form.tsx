@@ -6,6 +6,7 @@ import { purchaseSchema, type PurchaseInput } from "@/lib/schema";
 type OfferDraft = { priceMxn: number | null; installmentCount: number | null; installmentAmountMxn: number | null };
 type Props = { onSubmit: (input: PurchaseInput) => void; onBack: () => void; draft?: OfferDraft | null; aiLabel?: string | null };
 const initial = (draft?: OfferDraft | null) => ({ priceMxn: draft?.priceMxn?.toString() ?? "", installmentCount: draft ? draft.installmentCount?.toString() ?? "" : "6", installmentAmountMxn: draft?.installmentAmountMxn?.toString() ?? "", firstDueDate: "", knownFeesMxn: "", essentialExpensesMxn: "", existingMonthlyPaymentsMxn: "", selfSetMonthlyLimitMxn: "" });
+type FormValues = ReturnType<typeof initial>;
 const pesos = (s: string) => s === "" ? null : Number(s);
 
 export function ManualForm({ onSubmit, onBack, draft, aiLabel }: Props) {
@@ -13,13 +14,15 @@ export function ManualForm({ onSubmit, onBack, draft, aiLabel }: Props) {
   const [errors, setErrors] = useState<string[]>([]);
   const [feesUnknown, setFeesUnknown] = useState(true);
   const [dateUnknown, setDateUnknown] = useState(true);
-  function update(field: keyof typeof initial, value: string) { setValues((current) => ({ ...current, [field]: value })); }
+  function update(field: keyof FormValues, value: string) { setValues((current) => ({ ...current, [field]: value })); }
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const missingContext = [values.essentialExpensesMxn === "" ? "Indica tus gastos esenciales o escribe 0." : "", values.existingMonthlyPaymentsMxn === "" ? "Indica tus pagos actuales o escribe 0." : ""].filter(Boolean);
+    if (missingContext.length) { setErrors(missingContext); return; }
     const parsed = purchaseSchema.safeParse({
       priceMxn: Number(values.priceMxn), installmentCount: Number(values.installmentCount),
       installmentAmountMxn: pesos(values.installmentAmountMxn), firstDueDate: dateUnknown ? null : values.firstDueDate,
-      knownFeesMxn: feesUnknown ? null : pesos(values.knownFeesMxn), essentialExpensesMxn: Number(values.essentialExpensesMxn || 0),
+      knownFeesMxn: feesUnknown ? null : Number(values.knownFeesMxn || 0), essentialExpensesMxn: Number(values.essentialExpensesMxn || 0),
       existingMonthlyPaymentsMxn: Number(values.existingMonthlyPaymentsMxn || 0), selfSetMonthlyLimitMxn: pesos(values.selfSetMonthlyLimitMxn),
       otherDebtsNotIncluded: true, source: aiLabel ? "screenshot" : "manual", confirmedByUser: true,
     });
@@ -39,8 +42,8 @@ export function ManualForm({ onSubmit, onBack, draft, aiLabel }: Props) {
     <div className="divider" />
     <div className="section-head"><h2>Tu situación mensual</h2><p>Montos aproximados en MXN. No necesitamos saber a quién pagas.</p></div>
     <div className="form-grid">
-      <Field label="Gastos esenciales mensuales" value={values.essentialExpensesMxn} onChange={(v) => update("essentialExpensesMxn", v)} placeholder="0" hint="Puedes poner 0 si prefieres omitirlos." />
-      <Field label="Pagos actuales a meses" value={values.existingMonthlyPaymentsMxn} onChange={(v) => update("existingMonthlyPaymentsMxn", v)} placeholder="0" hint="Solo los compromisos que quieras incluir." />
+      <Field label="Gastos esenciales mensuales" value={values.essentialExpensesMxn} onChange={(v) => update("essentialExpensesMxn", v)} placeholder="0" hint="Si no quieres contarlos, escribe 0." required />
+      <Field label="Pagos actuales a meses" value={values.existingMonthlyPaymentsMxn} onChange={(v) => update("existingMonthlyPaymentsMxn", v)} placeholder="0" hint="Incluye los pagos que conoces; escribe 0 si no tienes." required />
       <Field label="Tu límite mensual (opcional)" value={values.selfSetMonthlyLimitMxn} onChange={(v) => update("selfSetMonthlyLimitMxn", v)} placeholder="Sin límite definido" hint="Tú lo defines; cambiarlo no modifica los cálculos." />
     </div>
     <p className="notice amber" style={{marginTop:16}}>No vemos todas tus deudas. Solo contamos lo que tú incluyes; otros pagos pueden faltar.</p>
