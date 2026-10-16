@@ -1,5 +1,6 @@
 import type { PurchaseInput } from "@/lib/schema";
 import { calculateCheck } from "@/lib/finance";
+import { ResultExplanation } from "./result-explanation";
 
 const money = (value: number) => new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 2 }).format(value);
 const statusCopy = {
@@ -15,6 +16,7 @@ export function ResultView({ input, onEdit, onContinue }: { input: PurchaseInput
   return <section className="card">
     <div className="stepper"><span className="step done"><b>✓</b> Compra</span><span>────</span><span className="step done"><b>✓</b> Tu situación</span><span>────</span><span className="step active"><b>3</b> Resultado</span></div>
     <div className={`result-banner ${result.limitStatus}`}><span aria-hidden="true" style={{fontSize:24}}>●</span><div><h2>{title}</h2><p style={{margin:"6px 0 0"}}>{explanation}</p></div></div>
+    <ResultExplanation input={{ limitStatus: result.limitStatus, totalKnownCostMxn: result.totalKnownCostMxn, monthlyPaymentMxn: result.monthlyPaymentMxn, nextMonthKnownObligationMxn: result.nextMonthKnownObligationMxn, feesUnknown: result.feesUnknown, dueDateUnknown: result.dueDateUnknown, otherDebtsNotIncluded: true }} />
     <div className="metric-grid">
       <Metric title="Costo conocido total" value={money(result.totalKnownCostMxn)} />
       <Metric title="Pago nuevo mensual" value={money(result.monthlyPaymentMxn)} />

@@ -35,3 +35,15 @@ export const extractedOfferSchema = z.object({
   installmentCount: z.number().int().min(1).max(48).nullable(),
   installmentAmountMxn: money.nullable(),
 });
+
+export const explanationInputSchema = z.object({
+  limitStatus: z.enum(["within", "review", "wait", "no_limit"]),
+  totalKnownCostMxn: nonNegativeMoney,
+  monthlyPaymentMxn: nonNegativeMoney,
+  nextMonthKnownObligationMxn: nonNegativeMoney,
+  feesUnknown: z.boolean(),
+  dueDateUnknown: z.boolean(),
+  otherDebtsNotIncluded: z.literal(true),
+});
+
+export type ExplanationInput = z.infer<typeof explanationInputSchema>;

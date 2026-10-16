@@ -5,6 +5,7 @@ import { ScreenshotPath } from "./screenshot-path";
 import { ResultView } from "./result-view";
 import { ComprehensionCheck } from "./comprehension-check";
 import { ManualForm } from "./manual-form";
+import { ResultExplanation } from "./result-explanation";
 import { purchaseSchema } from "@/lib/schema";
 import { calculateCheck } from "@/lib/finance";
 
@@ -23,6 +24,7 @@ describe("buyer-first product constraints", () => {
   });
   it("keeps a continue action when status is wait", () => {
     render(<ResultView input={entry} onEdit={() => {}} onContinue={() => {}} />);
+    expect(screen.getByText(/explicación simulada/i)).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Espera" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /continuar de todos modos/i })).toBeEnabled();
   });
@@ -58,6 +60,21 @@ describe("buyer-first product constraints", () => {
     fireEvent.change(screen.getByLabelText(/¿qué dato sigue faltando/i), { target: { value: "yes" } });
     fireEvent.click(screen.getByRole("button", { name: /revisar respuestas/i }));
     expect(screen.getByRole("status")).toHaveTextContent(/entendiste/i);
+  });
+  it("sends only validated calculations after an explicit AI explanation request", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({ json: async () => ({ configured: true }) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ mode: "ai_assisted", explanation: "Explicación breve." }) });
+    vi.stubGlobal("fetch", fetchMock);
+    const explanationInput = { limitStatus: "wait" as const, totalKnownCostMxn: 3000, monthlyPaymentMxn: 500, nextMonthKnownObligationMxn: 1700, feesUnknown: true, dueDateUnknown: true, otherDebtsNotIncluded: true as const };
+    render(<ResultExplanation input={explanationInput} />);
+    await waitFor(() => expect(screen.getByRole("button", { name: /pedir explicación con ia/i })).toBeInTheDocument());
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole("button", { name: /pedir explicación con ia/i }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(fetchMock.mock.calls[1][1]).toMatchObject({ method: "POST", body: JSON.stringify(explanationInput) });
+    expect(screen.getByText("Explicación breve.")).toBeInTheDocument();
+    vi.unstubAllGlobals();
   });
 });
 

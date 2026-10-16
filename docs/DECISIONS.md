@@ -14,6 +14,7 @@
 
 - Created a responsive Spanish (Mexico) app based on the supplied mobile mockup, with a buyer-first landing page, validated manual entry, deterministic result/timeline, unknown-data disclosures, and a comprehension check.
 - Added optional screenshot selection with PNG/JPG/WebP and 4 MB limits, server-only OpenAI vision when configured, structured candidate validation, and per-field confirmation. Without the key, the screenshot remains local and the example data is visibly simulated.
+- Added an optional server-only OpenAI explanation endpoint. It receives only validated calculation values after the user explicitly asks for it, and cannot set the status or financial math. Without a key or if the service fails, the visible explanation is deterministic and labeled “Explicación simulada”.
 - Added Vitest coverage for validation, money math, schedule dates, advisory thresholds, buyer-control copy, continuation, comprehension, and simulated screenshot confirmation.
 - `docs/PACKET.md` was not changed.
 
@@ -23,12 +24,13 @@
 - No real personal financial data is persisted. There is no database, auth, or Supabase; RLS is not applicable.
 - Zod validates purchase values and extracted candidates. The browser and server enforce accepted image MIME types and a 4 MB maximum. Impossible dates and out-of-range values are rejected.
 - The optional vision request sends the user-selected image to OpenAI only when the server key is configured. The route uses fixed instructions and sends no raw user-entered text. Vision output cannot supply calculations or status.
+- The optional explanation request sends only Zod-validated numeric outputs, advisory status, and unknown flags after an explicit user action. A key availability check sends no financial values. The key remains server-only; the explanation cannot change calculation results.
 - `npm audit`: zero known vulnerabilities after upgrading to Next.js 16.4.2.
 
 ## Unresolved risks
 
 - The simulated screenshot fields are synthetic sample values, not OCR. Users may still over-trust candidate extraction despite the confirmation step.
-- Live vision behavior, model availability, provider retention settings, request-cost controls, and rate limiting have not been evaluated. A configured server key enables the route; no OpenAI key is present in this workspace.
+- Live vision and explanation behavior, model availability, provider retention settings, request-cost controls, and rate limiting have not been evaluated. A configured server key enables the routes; no OpenAI key is present in this workspace, so both currently use simulated outputs.
 - Missing due dates are shown as unknown. For the next-month estimate only, an unknown date is conservatively treated as a payment next month; the interface should continue to make that assumption clear.
 - No external persona walkthrough, live URL, or production deployment was performed in this session.
 - Next 16 uses Turbopack; the production build succeeds.
