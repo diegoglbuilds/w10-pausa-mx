@@ -66,6 +66,7 @@ p { line-height:1.55; }
 .unknown-list { margin:8px 0 0; padding-left:19px; color:#59586a; line-height:1.8; }
 .question { display:grid; gap:8px; margin:15px 0; }
 .question label { font-weight:700; font-size:14px; }
+.question input,.question select { width:100%; min-height:46px; border:1px solid #dcdbe5; border-radius:11px; padding:10px 12px; background:white; color:var(--ink); }
 .footer-note { margin:22px 0 0; text-align:center; color:#484757; font-size:14px; font-weight:700; }
 .file-input { border:1px dashed #b9b7ca; border-radius:13px; padding:18px; }
 .badge { display:inline-flex; align-items:center; padding:5px 9px; border-radius:999px; background:#eeedff; color:#3d35a8; font-size:12px; font-weight:700; }
