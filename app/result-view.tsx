@@ -19,7 +19,7 @@ export function ResultView({ input, onEdit, onContinue }: { input: PurchaseInput
       <Metric title="Costo conocido total" value={money(result.totalKnownCostMxn)} />
       <Metric title="Pago nuevo mensual" value={money(result.monthlyPaymentMxn)} />
       <Metric title="Compromisos actuales / mes" value={money(result.existingMonthlyPaymentsMxn)} />
-      <Metric title="Pagos conocidos el próximo mes" value={money(result.nextMonthKnownObligationMxn)} />
+      <Metric title="Pagos estimados el próximo mes" value={money(result.nextMonthKnownObligationMxn)} />
     </div>
     <section style={{marginTop:22}}><h2>Tu límite y pagos mensuales</h2><div className="metric-grid" style={{marginTop:12}}>
       <Metric title="Límite que definiste" value={result.selfSetMonthlyLimitMxn === null ? "Sin límite" : money(result.selfSetMonthlyLimitMxn)} />
@@ -29,7 +29,7 @@ export function ResultView({ input, onEdit, onContinue }: { input: PurchaseInput
     <section className="card" style={{marginTop:18,padding:18,boxShadow:"none"}}><h2>Calendario de esta compra</h2><div className="timeline" style={{marginTop:10}}>{result.monthlyTimeline.map((payment, index) => <div className="timeline-row" key={index}><span>{payment.label}</span><strong>{index === 0 ? "Primer pago" : `Pago ${index + 1}`}</strong><strong>{money(payment.amountMxn)}</strong></div>)}</div></section>
     <section className="notice amber" style={{marginTop:18}}><strong>Datos faltantes o no incluidos</strong><ul className="unknown-list">
       {result.feesUnknown && <li>Comisiones: desconocidas; no se sumaron.</li>}
-      {result.dueDateUnknown && <li>Fecha del primer pago: desconocida; el calendario muestra el orden, no fechas.</li>}
+      {result.dueDateUnknown && <li>Fecha del primer pago: desconocida; asumimos una mensualidad el próximo mes. El calendario muestra el orden, no fechas.</li>}
       <li>Otras deudas: no incluidas salvo los pagos que tú anotaste.</li>
     </ul></section>
     <p className="muted">El costo conocido suma {input.installmentAmountMxn === null ? "precio ÷ mensualidades" : "el pago mensual que ingresaste"} × {input.installmentCount} mensualidades{input.knownFeesMxn === null ? "; no incluye comisiones desconocidas." : ` + ${money(input.knownFeesMxn)} de comisiones conocidas.`}</p>
