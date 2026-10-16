@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { ManualForm } from "./manual-form";
+import type { PurchaseInput } from "@/lib/schema";
 
 export default function Home() {
   const [started, setStarted] = useState(false);
+  const [purchase, setPurchase] = useState<PurchaseInput | null>(null);
   return <main className="shell"><div className="container">
     <header className="topbar"><div><div className="brand"><span className="brand-mark">Ⅱ</span> Pausa MX</div><div className="eyebrow">Chequeo de Cuotas</div></div><span className="badge">Sin banco · sin juicios</span></header>
     {!started ? <>
@@ -17,7 +20,7 @@ export default function Home() {
         <article className="card feature"><span className="feature-icon">◇</span><div><strong>Lo desconocido se queda visible</strong><span>No inventamos comisiones, fechas ni otras deudas.</span></div></article>
       </section>
       <section className="notice" style={{marginTop:18}}><strong>Tu decisión sigue siendo tuya.</strong> Mostramos consecuencias para ayudarte a entender la compra; eso no significa que demos permiso ni que decidamos por ti.</section>
-    </> : <section className="card"><div className="section-head"><span className="badge">Chequeo manual</span><h2 style={{marginTop:12}}>Empecemos con la compra</h2><p>Solo usaremos lo que tú confirmes. Puedes dejar datos como desconocidos.</p></div><div className="notice">La captura de datos estará disponible en el siguiente paso de este flujo.</div><div className="actions"><button className="btn secondary" onClick={() => setStarted(false)}>Volver al inicio</button></div></section>}
+    </> : purchase ? <section className="card"><div className="section-head"><h2>Compra capturada</h2></div><p>Tu revisión está lista para calcular.</p><button className="btn secondary" onClick={() => setPurchase(null)}>Editar datos</button></section> : <ManualForm onSubmit={setPurchase} onBack={() => setStarted(false)} />}
     <p className="footer-note">Tú decides. Pausa MX no bloquea compras ni decide por ti.</p>
   </div></main>;
 }
