@@ -46,6 +46,21 @@ describe("buyer-first product constraints", () => {
     expect(screen.getByRole("alert")).toHaveTextContent(/indica tus gastos esenciales/i);
     expect(screen.getByRole("alert")).toHaveTextContent(/indica tus pagos actuales/i);
   });
+  it("does not treat blank known fees as confirmed zero", () => {
+    const onSubmit = vi.fn();
+    render(<ManualForm onSubmit={onSubmit} onBack={() => {}} />);
+    fireEvent.change(screen.getByLabelText(/precio de compra/i), { target: { value: "3000" } });
+    fireEvent.change(screen.getByLabelText(/gastos esenciales mensuales/i), { target: { value: "0" } });
+    fireEvent.change(screen.getByLabelText(/pagos actuales a meses/i), { target: { value: "0" } });
+    fireEvent.click(screen.getByLabelText(/no conozco las comisiones/i));
+    fireEvent.click(screen.getByRole("button", { name: /ver mi resultado/i }));
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(screen.getByRole("alert")).toHaveTextContent(/indica las comisiones conocidas o marca que no las conoces/i);
+
+    fireEvent.change(screen.getByLabelText(/comisiones conocidas/i), { target: { value: "0" } });
+    fireEvent.click(screen.getByRole("button", { name: /ver mi resultado/i }));
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ knownFeesMxn: 0 }));
+  });
   it("checks comprehension without blocking continuation", () => {
     render(<ComprehensionCheck result={calculateCheck(entry)} onBack={() => {}} onContinue={() => {}} />);
     expect(screen.getByLabelText(/¿cuánto pagarías en total/i)).toBeInTheDocument();

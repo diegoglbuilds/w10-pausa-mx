@@ -17,7 +17,7 @@ export function ManualForm({ onSubmit, onBack, draft, aiLabel }: Props) {
   function update(field: keyof FormValues, value: string) { setValues((current) => ({ ...current, [field]: value })); }
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const missingContext = [values.essentialExpensesMxn === "" ? "Indica tus gastos esenciales o escribe 0." : "", values.existingMonthlyPaymentsMxn === "" ? "Indica tus pagos actuales o escribe 0." : ""].filter(Boolean);
+    const missingContext = [values.essentialExpensesMxn === "" ? "Indica tus gastos esenciales o escribe 0." : "", values.existingMonthlyPaymentsMxn === "" ? "Indica tus pagos actuales o escribe 0." : "", !feesUnknown && values.knownFeesMxn === "" ? "Indica las comisiones conocidas o marca que no las conoces." : ""].filter(Boolean);
     if (missingContext.length) { setErrors(missingContext); return; }
     const parsed = purchaseSchema.safeParse({
       priceMxn: Number(values.priceMxn), installmentCount: Number(values.installmentCount),

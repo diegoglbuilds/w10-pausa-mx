@@ -38,3 +38,15 @@
 ## Tomorrow’s first move
 
 Run a mobile walkthrough with the synthetic Karla persona. Check whether she can explain the known total, next-month obligation, and remaining unknowns after entering one real-world-shaped but fictional offer. Adjust unclear labels before any deployment.
+
+## Mechanical Test — Post Deploy #1
+
+- **Testing method:** Source inspection against the mechanical test plan, existing Vitest/Testing Library coverage, then `npm test` and `npm run build`. No browser interaction or production behavior is claimed from this pass.
+- **Browser automation available:** no.
+- **Production browser verification available:** no.
+- **Real bug found:** When the user unchecked “No conozco las comisiones” but left the fee amount blank, the form converted the blank string to `0` and accepted the input as known zero fees.
+- **Why it mattered:** This silently understated the known total and hid an unanswered cost, violating the requirement to preserve unknowns and making the result less reliable at the purchase decision.
+- **Fix applied:** The form now rejects an empty fee amount when fees are marked known, with an instruction to enter an amount or mark fees unknown. An explicit `0` remains valid.
+- **Regression test:** Added a form test proving blank known fees are rejected and an explicitly entered zero is accepted.
+- **Remaining risks:** No live browser or production walkthrough was available. Vision and external explanation behavior remain unverified in a browser. A persona test is still needed.
+- **Next session first move:** persona test.
